@@ -7,5 +7,5 @@
 - explore: nyc_taxi_trips
   sql_always_where: |
     ${location_valid} 
-    AND ${fare}/${trip_distance} BETWEEN 2 AND 10 
+    AND ${fare}/${trip_distance} BETWEEN 2 AND 10
     
