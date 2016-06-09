@@ -266,6 +266,11 @@
     type: count
     filters:
       tipped: Yes
+  
+  - measure: count_who_did_not_tip
+    type: count
+    filters:
+      tipped: No
       
   - measure: percent_who_tipped
     type: number
