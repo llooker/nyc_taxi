@@ -1,5 +1,5 @@
 view: nyc_taxi_trips {
-  sql_table_name: [nyc-tlc:yellow.trips] ;;
+  sql_table_name: `nyc-tlc.yellow.trips` ;;
   #   sql_table_name: "[nyc-tlc:yellow.trips],[nyc-tlc:green.trips_2015]"
 
   dimension_group: pickup {
@@ -179,10 +179,10 @@ view: nyc_taxi_trips {
     sql_longitude: round(${TABLE}.dropoff_longitude, 3) ;;
   }
 
-  dimension: is_pickup_different_from_dropoff {
-    type: yesno
-    sql: ${pickup_location_rounded}<>${dropoff_location_rounded} ;;
-  }
+#   dimension: is_pickup_different_from_dropoff {
+#     type: yesno
+#     sql: ${pickup_location_rounded}<>${dropoff_location_rounded} ;;
+#   }
 
   dimension: location_valid {
     type: yesno
@@ -294,7 +294,7 @@ view: nyc_taxi_trips {
 
   dimension: tip_percentage {
     type: number
-    sql: (${tip} / ${fare}) * 100 ;;
+    sql: (${tip} / nullif(${fare}, 0)) * 100 ;;
     value_format: "0.00\"%\""
   }
 
@@ -315,7 +315,7 @@ view: nyc_taxi_trips {
 
   dimension: tip_percentage_rounded {
     type: number
-    sql: ROUND((${tip} / ${fare}) * 100) ;;
+    sql: ROUND((${tip} / nullif(${fare}, 0)) * 100) ;;
     value_format: "0\"%\""
   }
 
@@ -349,7 +349,7 @@ view: nyc_taxi_trips {
 
   dimension: trip_time_minutes {
     type: number
-    sql: (TIMESTAMP_TO_SEC(${TABLE}.dropoff_datetime)-TIMESTAMP_TO_SEC(${TABLE}.pickup_datetime))/60 ;;
+    sql: (UNIX_SECONDS(${TABLE}.dropoff_datetime)-UNIX_SECONDS(${TABLE}.pickup_datetime))/60 ;;
     value_format: "#0.0"
   }
 
@@ -427,20 +427,20 @@ view: nyc_taxi_trips {
 
   measure: percent_who_tipped {
     type: number
-    sql: (CAST(${count_who_tipped} AS float) / CAST(${count} AS float)) * 100 ;;
+    sql: (CAST(${count_who_tipped} AS float) / nullif(CAST(${count} AS float)), 0) * 100 ;;
     value_format: "0.00\"%\""
   }
 
   measure: total_trip_time_seconds {
     hidden: yes
     type: sum
-    sql: (TIMESTAMP_TO_SEC(${TABLE}.dropoff_datetime)-TIMESTAMP_TO_SEC(${TABLE}.pickup_datetime)) ;;
+    sql: (UNIX_SECONDS(${TABLE}.dropoff_datetime)-UNIX_SECONDS(${TABLE}.pickup_datetime)) ;;
   }
 
   measure: average_trip_time_seconds {
     hidden: yes
     type: average
-    sql: (TIMESTAMP_TO_SEC(${TABLE}.dropoff_datetime)-TIMESTAMP_TO_SEC(${TABLE}.pickup_datetime)) ;;
+    sql: (UNIX_SECONDS(${TABLE}.dropoff_datetime)-UNIX_SECONDS(${TABLE}.pickup_datetime)) ;;
   }
 
   measure: total_trip_time_minutes {
@@ -458,7 +458,7 @@ view: nyc_taxi_trips {
 
   measure: average_speed {
     type: number
-    sql: ${total_distance}/(${total_trip_time_seconds}/3600) ;;
+    sql: ${total_distance}/nullif((${total_trip_time_seconds}/3600), 0) ;;
     value_format: "#0.0\" mph\""
   }
 
