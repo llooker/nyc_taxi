@@ -427,7 +427,7 @@ view: nyc_taxi_trips {
 
   measure: percent_who_tipped {
     type: number
-    sql: (CAST(${count_who_tipped} AS float) / nullif(CAST(${count} AS float)), 0) * 100 ;;
+    sql: (CAST(${count_who_tipped} AS numeric) / CAST(${count} AS numeric)) * 100 ;;
     value_format: "0.00\"%\""
   }
 
